@@ -1,0 +1,25 @@
+{
+    "directed": true,
+    "graph": [["name", "gnm_random_graph(10,5)"]],
+    "nodes": [
+        {"name": "1080", "id": 0, "class": "succeeded"},
+        {"name": "bombic", "id": 1, "class": "succeeded"},
+        {"name": "cyanicide", "id": 2, "class": "no-builds"},
+        {"name": "fishbone", "id": 3, "class": "succeeded"},
+        {"name": "impossibilification", "id": 4, "class": "failed"},
+        {"name": "merostomatous", "id": 5, "class": "pending"},
+        {"name": "packplane", "id": 6, "class": "errored"},
+        {"name": "raying", "id": 7, "class": "succeeded"},
+        {"name": "sortilegious", "id": 8, "class": "paused"},
+        {"name": "two-speed", "id": 9, "class": "aborted"}
+   ],
+
+   "links": [
+       {"source": 2, "target": 0},
+       {"source": 2, "target": 7},
+       {"source": 4, "target": 3},
+       {"source": 6, "target": 8},
+       {"source": 8, "target": 2}
+   ],
+   "multigraph": false
+ }

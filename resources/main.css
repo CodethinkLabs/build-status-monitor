@@ -1,0 +1,58 @@
+body, pre {
+    font-family: monospace;
+}
+
+body {
+    font-weight: 600;
+    font-size: 1.2em;
+    line-height: 1.4;
+    margin: 0;
+    background: #273747;
+    color: #E6E7E8;
+}
+
+h1 {
+    font-size: 2em;
+    padding-left: 30px;
+}
+
+svg .node.pending rect {
+    fill: #BDC3C7;
+}
+
+svg .node.succeeded rect {
+    fill: #2ECC71;
+}
+
+svg .node.failed rect {
+    fill: #E74C3C;
+}
+
+svg .node.errored rect {
+    fill: #E67E22;
+}
+
+svg .node.aborted rect {
+    fill: #8F4B2D;
+}
+
+svg .node.paused rect {
+    fill: #3498DB;
+}
+
+svg .node.no-builds rect {
+    fill: #5D6D7E;
+}
+
+svg .edge {
+    stroke: #5D6D7E;
+}
+
+.edge {
+    stroke-width: 4px;
+    fill: none;
+}
+
+.node text {
+    fill: #fff;
+}
