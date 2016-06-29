@@ -107,32 +107,45 @@ func parse_graph_json(file_path string) {
 
     fmt.Printf("columns: %v\n", columns)
 
-    for _, link := range graph.Links {
-        node_ref, err := find_node_in_graph(link.Target)
-        if (err != nil) {
-            fmt.Printf("Error: %v\n", err)
-            return 
+    for cols_sorted := false; !cols_sorted; {
+        cols_sorted = true
+
+        for _, link := range graph.Links {
+            node_ref, err := find_node_in_graph(link.Target)
+            if (err != nil) {
+                fmt.Printf("Error: %v\n", err)
+                return
+            }
+
+            col_num, err:= get_node_column_number(link.Target)
+            if (err != nil) {
+                fmt.Printf("Error: %v\n", err)
+                return
+            }
+
+            parent_col_num, err:= get_node_column_number(link.Source)
+            if (err != nil) {
+                fmt.Printf("Error: %v\n", err)
+                return
+            }
+
+            if (parent_col_num >= col_num) {
+                cols_sorted = false
+
+                if ((parent_col_num + 1) >= len(columns)) {
+                    columns = append(columns, []Node{})
+                }
+
+                new_col := parent_col_num + 1
+
+                err = remove_node_from_columns(node_ref.ID)
+                if (err != nil) {
+                    fmt.Printf("Error: %v\n", err)
+                    return
+                }
+                columns[new_col] = append (columns[new_col], *node_ref)
+            }
         }
-
-        parent_col_num, err:= get_node_column_number(link.Source)
-        if (err != nil) {
-            fmt.Printf("Error: %v\n", err)
-            return 
-        }
-
-        if ((parent_col_num + 1) >= len(columns)) {
-            columns = append(columns, []Node{})
-        }
-
-        new_col := parent_col_num + 1
-
-        err = remove_node_from_columns(node_ref.ID)
-        if (err != nil) {
-            fmt.Printf("Error: %v\n", err)
-            return 
-        }
-        columns[new_col] = append (columns[new_col], *node_ref)
-
     }
 
     for i, column := range columns {
