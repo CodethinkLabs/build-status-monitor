@@ -99,7 +99,13 @@ func parse_graph_json(file_path string) {
         fmt.Printf("Node: %v\n", node.Name)
     }
     
-    columns = append(columns, graph.Nodes)
+    columns = make([][]Node, 1)
+    for i := range columns {
+        columns[i] = make([]Node, len(graph.Nodes))
+    }
+    copy(columns[0], graph.Nodes)
+
+    fmt.Printf("columns: %v\n", columns)
 
     for _, link := range graph.Links {
         node_ref, err := find_node_in_graph(link.Target)
@@ -133,4 +139,6 @@ func parse_graph_json(file_path string) {
         fmt.Printf("Column %d: %v\n", i, column)
     }
     
+    fmt.Printf("Graph Nodes: %v\n",  graph.Nodes)
+
 }
