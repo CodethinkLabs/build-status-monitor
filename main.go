@@ -15,6 +15,8 @@ func main() {
     homeTempl = template.Must(template.ParseFiles(filepath.Join("index.html")))
     http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 
+    parse_graph_json("./resources/build-graph.json")
+
     h := newHub()
     go h.run()
     http.HandleFunc("/", homeHandler)
