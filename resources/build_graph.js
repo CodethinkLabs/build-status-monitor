@@ -137,7 +137,7 @@ app.directive('buildGraph', ["graphService", function (){
 		})
 	}
 	return {
-        link: link,
+		link: link,
 		restrict: 'E'
 	};
 }]);
