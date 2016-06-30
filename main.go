@@ -6,22 +6,30 @@ import (
   "net/http"
   "path/filepath"
   "text/template"
+
+  "github.com/gorilla/mux"
 )
 
 var homeTempl *template.Template
 
-func main() {
+func main() { 
     flag.Parse()
-    homeTempl = template.Must(template.ParseFiles(filepath.Join("index.html")))
-    http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 
     parse_graph_json("./resources/build-graph.json")
 
     h := newHub()
-    go h.run()
-    http.HandleFunc("/", homeHandler)
-    http.Handle("/ws", wsHandler{h: h})
+    r := mux.NewRouter()
+    homeTempl = template.Must(template.ParseFiles(filepath.Join("index.html")))
 
+    r.HandleFunc("/columns/", ColumnsHandler)
+    r.HandleFunc("/links/", LinksHandler)
+    r.HandleFunc("/", homeHandler)
+    r.Handle("/ws", wsHandler{h: h})
+
+    http.Handle("/", r)
+    http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
+
+    go h.run()
     go listenForMessages(h)
 
     var addr = flag.String("addr", ":8080", "http service address")

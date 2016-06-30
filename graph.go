@@ -5,25 +5,27 @@ import (
     "errors"
     "encoding/json"
     "io/ioutil"
+
+    "net/http"
 )
 
 type Node struct {
-    Name  string
-    ID    int
-    Class string
+    Name  string `json:"name"`
+    ID    int    `json:"id"`
+    Class string `json:"class"`
 }
 
 type Link struct {
-    Source int
-    Target int
+    Source int `json:"source"`
+    Target int `json:"target"`
 }
 
 type Graph struct {
-    Directed   bool
-    Graph      [][]string
-    Nodes      []Node
-    Links      []Link
-    Multigraph bool
+    Directed   bool       `json:"directed"`
+    Graph      [][]string `json:"graph"`
+    Nodes      []Node     `json:"nodes"`
+    Links      []Link     `json:"links"`
+    Multigraph bool       `json:"mulitgraph"`
 }
 
 var graph Graph
@@ -154,4 +156,24 @@ func parse_graph_json(file_path string) {
     
     fmt.Printf("Graph Nodes: %v\n",  graph.Nodes)
 
+}
+
+func ColumnsHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Printf("Columns handler triggered")
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+    w.WriteHeader(http.StatusOK)
+    if err := json.NewEncoder(w).Encode(columns); err != nil {
+        panic(err)
+    }
+    return
+}
+
+func LinksHandler(w http.ResponseWriter, r *http.Request) {
+    fmt.Printf("Links handler triggered")
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+    w.WriteHeader(http.StatusOK)
+    if err := json.NewEncoder(w).Encode(graph.Links); err != nil {
+        panic(err)
+    }
+    return
 }
