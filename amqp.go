@@ -9,8 +9,8 @@ import (
 )
 
 type Message struct {
-	ID     int
-	Name   string
+	ID	int
+	Name	string
 	Status string
 }
 
