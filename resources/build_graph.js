@@ -15,9 +15,7 @@ app.directive('buildGraph', ["graphService", function (){
 
 		columns = [];
 
-		nodes = [];
 		links = [];
-
 		links_list = [];
 
 		find_node_in_columns = function(id) {
@@ -60,12 +58,10 @@ app.directive('buildGraph', ["graphService", function (){
 
 		d3.json("/columns/", function (data) {
 			columns = data;
-			console.log(columns);
 		});
 
 		d3.json("/links/", function (data) {
 			links = data;
-			console.log(links);
 
 			for (var i = 0; i < links.length; i++) {
 				// Append object references to link list.
@@ -76,8 +72,6 @@ app.directive('buildGraph', ["graphService", function (){
 					target: find_node_in_columns(links[i].source)
 				};
 			}
-
-			console.log(links_list);
 
 			var canvas = d3.select(element[0]).append("svg")
 			.attr("width", "1000")
@@ -113,18 +107,22 @@ app.directive('buildGraph', ["graphService", function (){
 
 		node.append("text")
 			.text(function (d) { return d.name; })
-			.attr("transform", function(d){
-			return "translate(6, 20)";
+			.attr("transform", function(d) {
+				return "translate(6, 20)";
 			})
 
 		var diagonal = d3.svg.diagonal()
 			.source(function (d) {
-				return {x: (d.source.y + (node_height / 2)),
-						y: d.source.x};
+				return {
+					x: (d.source.y + (node_height / 2)),
+					y: (d.source.x)
+				};
 			})
 			.target(function (d) {
-				return {x: (d.target.y + (node_height / 2)),
-						y: (d.target.x + node_width)};
+				return {
+					x: (d.target.y + (node_height / 2)),
+					y: (d.target.x + node_width)
+				};
 			})
 			.projection(function (d) {
 				return [d.y, d.x];
@@ -137,8 +135,6 @@ app.directive('buildGraph', ["graphService", function (){
 			.attr("class", "edge no-builds")
 			.attr("d", diagonal);
 		})
-
-		console.log(columns);
 	}
 	return {
         link: link,
@@ -150,7 +146,6 @@ app.service('graphService', function() {
 	this.getGraph = function() {
 		return "test";
 	}
-
 });
 
 if (window["WebSocket"]) {
