@@ -2,21 +2,91 @@ var conn;
 
 var app = angular.module('buildStatusMonitor', []);
 
-app.directive('buildGraph', ["graphService", function (){
-	function link(scope, element, attr){
 
-		node_width = 180;
-		node_height = 40;
+app.directive('buildGraph', function () {
+	function link(scope, element, attr) {
+		console.log(scope);
 
-		node_x_pad = 80;
-		node_y_pad = 25;
+		var canvas = d3.select(element[0]).append("svg")
+			.attr("width", "1000")
+			.attr("height", "1000");
 
-		canvas_pad = 30;
+		var tree = d3.layout.tree()
+			.size([1000, 1000]);
 
-		columns = [];
+		scope.$watch('columns', function(d) {
+			if (!d) return;
 
-		links = [];
-		links_list = [];
+			var column = canvas.selectAll(".column")
+				.data(scope.columns)
+				.enter()
+				.append("g")
+
+			var node = column.selectAll(".node")
+				.data( function(d) {
+					return d;
+				})
+				.enter()
+				.append("g")
+				.attr("class", function(d) {
+					return "node " + d.class;
+				})
+				.attr("transform", function (d, i) {
+					return "translate(" + scope.node_x(d)
+					+ "," + scope.node_y(d) + ")"
+				});
+
+			node.append("rect")
+				.attr("height", scope.node_height)
+				.attr("width", scope.node_width)
+				.attr("rx", 5)
+				.attr("ry", 5);
+
+			node.append("text")
+				.text(function (d) { return d.name; })
+				.attr("transform", function(d) {
+					return "translate(6, 20)";
+				})
+
+			var diagonal = d3.svg.diagonal()
+				.source(function (d) {
+					return {
+						x: (d.source.y + (scope.node_height / 2)),
+						y: (d.source.x)
+					};
+				})
+				.target(function (d) {
+					return {
+						x: (d.target.y + (scope.node_height / 2)),
+						y: (d.target.x + scope.node_width)
+					};
+				})
+				.projection(function (d) {
+					return [d.y, d.x];
+				});
+
+			column.select(".link")
+				.data(scope.links_list)
+				.enter()
+				.append("path")
+				.attr("class", "edge no-builds")
+				.attr("d", diagonal);
+
+			console.log("update");
+		}, true);
+	};
+
+	function controller($scope, $http) {
+		$scope.node_width = 180;
+		$scope.node_height = 40;
+
+		var node_x_pad = 80;
+		var node_y_pad = 25;
+
+		var canvas_pad = 30;
+
+		var columns = [];
+		var links_list = [];
 
 		find_node_in_columns = function(id) {
 			for (var i = 0; i < columns.length; i++)
@@ -24,7 +94,7 @@ app.directive('buildGraph', ["graphService", function (){
 				if (columns[i][j].id == id)
 					return columns[i][j];
 			return null;
-		}
+		};
 
 		get_node_column_number = function (id) {
 			for (var i = 0; i < columns.length; i++)
@@ -32,7 +102,7 @@ app.directive('buildGraph', ["graphService", function (){
 				if (columns[i][j].id == id)
 					return i;
 			return null;
-		}
+		};
 
 		get_node_row_number = function (id) {
 			for (var i = 0; i < columns.length; i++)
@@ -40,112 +110,52 @@ app.directive('buildGraph', ["graphService", function (){
 				if (columns[i][j].id == id)
 					return j;
 			return null;
-		}
+		};
 
-		node_x = function (d) {
+		$scope.node_x = function (d) {
 			d.x = (get_node_column_number(d.id)
-					* (node_width + node_x_pad)
+					* ($scope.node_width + node_x_pad)
 					+ canvas_pad);
 			return d.x;
-		}
+		};
 
-		node_y = function (d) {
+		$scope.node_y = function (d) {
 			d.y = (get_node_row_number(d.id)
-					* (node_height + node_y_pad))
+					* ($scope.node_height + node_y_pad))
 					+ canvas_pad;
 			return d.y;
-		}
+		};
 
-		d3.json("/columns/", function (data) {
-			columns = data;
-		});
-
-		d3.json("/links/", function (data) {
-			links = data;
-
-			for (var i = 0; i < links.length; i++) {
+		$http.get('/links/').success(function(data){
+			$scope.links = data;
+			$scope.links_list = [];
+			for (var i = 0; i < data.length; i++) {
 				// Append object references to link list.
 				// Flip source and target as they are backwards in the json.
-				console.log(links[i]);
-				links_list[links_list.length] = {
-					source: find_node_in_columns(links[i].target),
-					target: find_node_in_columns(links[i].source)
+				$scope.links_list[$scope.links_list.length] = {
+					source: find_node_in_columns(data[i].target),
+					target: find_node_in_columns(data[i].source)
 				};
 			}
+		}).error(function(err){
+			throw err;
+		});
 
-			var canvas = d3.select(element[0]).append("svg")
-			.attr("width", "1000")
-			.attr("height", "1000");
+		$http.get('/columns/').success(function(data){
+			$scope.columns = data;
+		}).error(function(err){
+			throw err;
+		});	
 
-		var tree = d3.layout.tree()
-			.size([1000, 1000]);
+		console.log($scope);
+	};	
 
-		var column = canvas.selectAll(".column")
-			.data(columns)
-			.enter()
-			.append("g")
-
-		var node = column.selectAll(".node")
-			.data( function(d) {
-				return d;
-			})
-			.enter()
-			.append("g")
-			.attr("class", function(d) {
-				return "node " + d.class;
-			})
-			.attr("transform", function (d, i) {
-				return "translate(" + node_x(d)
-				+ "," + node_y(d) + ")"
-			});
-
-		node.append("rect")
-			.attr("height", node_height)
-			.attr("width", node_width)
-			.attr("rx", 5)
-			.attr("ry", 5);
-
-		node.append("text")
-			.text(function (d) { return d.name; })
-			.attr("transform", function(d) {
-				return "translate(6, 20)";
-			})
-
-		var diagonal = d3.svg.diagonal()
-			.source(function (d) {
-				return {
-					x: (d.source.y + (node_height / 2)),
-					y: (d.source.x)
-				};
-			})
-			.target(function (d) {
-				return {
-					x: (d.target.y + (node_height / 2)),
-					y: (d.target.x + node_width)
-				};
-			})
-			.projection(function (d) {
-				return [d.y, d.x];
-			});
-
-		column.select(".link")
-			.data(links_list)
-			.enter()
-			.append("path")
-			.attr("class", "edge no-builds")
-			.attr("d", diagonal);
-		})
-	}
 	return {
+		restrict: 'E',
+		scope: '=',
 		link: link,
-		restrict: 'E'
+		controller: controller,
 	};
-}]);
-
-app.service('graphService', function() {
-	this.getGraph = function() {
-		return "test";
-	}
 });
 
 if (window["WebSocket"]) {
