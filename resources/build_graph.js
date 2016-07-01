@@ -154,7 +154,15 @@ if (window["WebSocket"]) {
 		console.log("Connection closed")
 	}
 	conn.onmessage = function(evt) {
-		console.log(evt.data);
+		message = JSON.parse(evt.data);
+		console.log(message.id);
+		console.log(message.status);
+
+		// TODO: use a map to speed up access to nodes.
+		var node = find_node_in_columns(message.id);
+		node.class = message.status;
+		console.log("New Status: " + node.class);
+		console.log(node);
 	}
 }
 else {

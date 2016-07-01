@@ -9,9 +9,8 @@ import (
 )
 
 type Message struct {
-	ID	int
-	Name	string
-	Status string
+	ID	int       `json:"id"`
+	Status string `json:"status"`
 }
 
 func failOnError(err error, msg string) {
@@ -55,7 +54,7 @@ func listenForMessages(h *hub) {
 
 	go func() {
 		for d := range msgs {
-			pend_message := Message{ 2, "cyanicide", "succeeded"}
+			pend_message := Message{ 2, "succeeded"}
 			log.Printf("struct:", pend_message)
 			enc_message, enc_err := json.Marshal(pend_message)
 			log.Printf("Encoded:", enc_message)
