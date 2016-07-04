@@ -14,11 +14,11 @@ app.directive('buildGraph', function () {
 		var tree = d3.layout.tree()
 			.size([1000, 1000]);
 
-		scope.$watch('columns', function(d) {
-			if (!d) return;
+		scope.$watch('graph', function(d) {
+			if (!d || !d.columns || !d.links_list) return;
 
 			var column = canvas.selectAll(".column")
-				.data(scope.columns)
+				.data(scope.graph.columns)
 				.enter()
 				.append("g")
 
@@ -32,13 +32,13 @@ app.directive('buildGraph', function () {
 					return "node " + d.class;
 				})
 				.attr("transform", function (d, i) {
-					return "translate(" + scope.node_x(d)
-					+ "," + scope.node_y(d) + ")"
+					return "translate(" + d.x
+					+ "," + d.y + ")"
 				});
 
 			node.append("rect")
-				.attr("height", scope.node_height)
-				.attr("width", scope.node_width)
+				.attr("height", 40)
+				.attr("width", 180)
 				.attr("rx", 5)
 				.attr("ry", 5);
 
@@ -51,14 +51,14 @@ app.directive('buildGraph', function () {
 			var diagonal = d3.svg.diagonal()
 				.source(function (d) {
 					return {
-						x: (d.source.y + (scope.node_height / 2)),
+						x: (d.source.y + (40 / 2)),
 						y: (d.source.x)
 					};
 				})
 				.target(function (d) {
 					return {
-						x: (d.target.y + (scope.node_height / 2)),
-						y: (d.target.x + scope.node_width)
+						x: (d.target.y + (40 / 2)),
+						y: (d.target.x + 180)
 					};
 				})
 				.projection(function (d) {
@@ -66,7 +66,7 @@ app.directive('buildGraph', function () {
 				});
 
 			column.select(".link")
-				.data(scope.links_list)
+				.data(scope.graph.links_list)
 				.enter()
 				.append("path")
 				.attr("class", "edge no-builds")
@@ -76,79 +76,12 @@ app.directive('buildGraph', function () {
 		}, true);
 	};
 
-	function controller($scope, $http) {
-		$scope.node_width = 180;
-		$scope.node_height = 40;
-
-		var node_x_pad = 80;
-		var node_y_pad = 25;
-
-		var canvas_pad = 30;
-
-		var columns = [];
-		var links_list = [];
-
-		find_node_in_columns = function(id) {
-			for (var i = 0; i < columns.length; i++)
-				for (var j = 0; j < columns[i].length; j++)
-				if (columns[i][j].id == id)
-					return columns[i][j];
-			return null;
-		};
-
-		get_node_column_number = function (id) {
-			for (var i = 0; i < columns.length; i++)
-				for (var j = 0; j < columns[i].length; j++)
-				if (columns[i][j].id == id)
-					return i;
-			return null;
-		};
-
-		get_node_row_number = function (id) {
-			for (var i = 0; i < columns.length; i++)
-				for (var j = 0; j < columns[i].length; j++)
-				if (columns[i][j].id == id)
-					return j;
-			return null;
-		};
-
-		$scope.node_x = function (d) {
-			d.x = (get_node_column_number(d.id)
-					* ($scope.node_width + node_x_pad)
-					+ canvas_pad);
-			return d.x;
-		};
-
-		$scope.node_y = function (d) {
-			d.y = (get_node_row_number(d.id)
-					* ($scope.node_height + node_y_pad))
-					+ canvas_pad;
-			return d.y;
-		};
-
-		$http.get('/links/').success(function(data){
-			$scope.links = data;
-			$scope.links_list = [];
-			for (var i = 0; i < data.length; i++) {
-				// Append object references to link list.
-				// Flip source and target as they are backwards in the json.
-				$scope.links_list[$scope.links_list.length] = {
-					source: find_node_in_columns(data[i].target),
-					target: find_node_in_columns(data[i].source)
-				};
-			}
-		}).error(function(err){
-			throw err;
-		});
-
-		$http.get('/columns/').success(function(data){
-			$scope.columns = data;
-		}).error(function(err){
-			throw err;
-		});	
+	function controller($scope, $http, graphService) {
+		console.log(graphService);
+		$scope.graph = graphService.get_graph();
 
 		console.log($scope);
-	};	
+	};
 
 	return {
 		restrict: 'E',
@@ -157,6 +90,88 @@ app.directive('buildGraph', function () {
 		controller: controller,
 	};
 });
+
+app.factory('graphService', function($http) {
+	var node_width = 180;
+	var node_height = 40;
+
+	var node_x_pad = 80;
+	var node_y_pad = 25;
+
+	var canvas_pad = 30;
+
+	var columns = [];
+	var links_list = [];
+
+	var find_node_in_columns = function(id) {
+		for (var i = 0; i < columns.length; i++)
+			for (var j = 0; j < columns[i].length; j++)
+			if (columns[i][j].id == id)
+				return columns[i][j];
+		return null;
+	};
+
+	var get_node_column_number = function (id) {
+		for (var i = 0; i < columns.length; i++)
+			for (var j = 0; j < columns[i].length; j++)
+			if (columns[i][j].id == id)
+				return i;
+		return null;
+	};
+
+	var get_node_row_number = function (id) {
+		for (var i = 0; i < columns.length; i++)
+			for (var j = 0; j < columns[i].length; j++)
+			if (columns[i][j].id == id)
+				return j;
+		return null;
+	};
+
+	var factory = {};
+
+	factory.get_graph = function() {
+		var graph = {}; 
+
+		$http.get('/columns/').success(function(data){
+			columns = data;
+			for (var x = 0; x < columns.length; x++) {
+				for (var y = 0; y < columns[x].length; y++) {
+					columns[x][y].x = x * (node_width + node_x_pad + canvas_pad);
+					columns[x][y].y = y * (node_height + node_y_pad+ canvas_pad);
+				}
+			}
+			graph.columns = columns;
+
+			$http.get('/links/').success(function(data){
+				links = data;
+				links_list = [];
+				for (var i = 0; i < data.length; i++) {
+					// Append object references to link list.
+					// Flip source and target as they are backwards in the json.
+					links_list[links_list.length] = {
+						source: find_node_in_columns(data[i].target),
+						target: find_node_in_columns(data[i].source)
+					};
+					console.log(links_list);
+				}
+				console.log(links_list);
+
+				graph.link = links;
+				graph.links_list = links_list;
+			}).error(function(err){
+				throw err;
+			});
+		}).error(function(err){
+			throw err;
+		});	
+
+		return graph
+	}
+
+	console.log("Factory instanciated");
+	console.log(factory);
+	return factory;
+ });
 
 if (window["WebSocket"]) {
 	conn = new WebSocket("ws://localhost:8080/ws");
