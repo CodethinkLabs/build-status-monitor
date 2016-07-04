@@ -88,6 +88,7 @@ app.directive('buildGraph', function () {
 				var node = graphService.find_node_in_graph($scope.graph, message.id);
 				console.log(node);
 				node.class = message.status;
+				$scope.$apply();
 				console.log(node);
 			}
 		}
@@ -161,8 +162,10 @@ app.factory('graphService', function($http) {
 			columns = data;
 			for (var x = 0; x < columns.length; x++) {
 				for (var y = 0; y < columns[x].length; y++) {
-					columns[x][y].x = x * (node_width + node_x_pad) + canvas_pad;
-					columns[x][y].y = y * (node_height + node_y_pad) + canvas_pad;
+					columns[x][y].x = x *
+						(node_width + node_x_pad) + canvas_pad;
+					columns[x][y].y = y *
+						(node_height + node_y_pad) + canvas_pad;
 				}
 			}
 			graph.columns = columns;
