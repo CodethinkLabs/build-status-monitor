@@ -10,8 +10,8 @@ import (
 )
 
 type Node struct {
-	Name	string `json:"name"`
-	ID	int	`json:"id"`
+	Name  string `json:"name"`
+	ID	  int    `json:"id"`
 	Class string `json:"class"`
 }
 
@@ -21,11 +21,11 @@ type Link struct {
 }
 
 type Graph struct {
-	Directed	bool	`json:"directed"`
-	Graph	[][]string `json:"graph"`
-	Nodes	[]Node	`json:"nodes"`
-	Links	[]Link	`json:"links"`
-	Multigraph bool	`json:"mulitgraph"`
+	Directed   bool       `json:"directed"`
+	Graph	   [][]string `json:"graph"`
+	Nodes      []Node     `json:"nodes"`
+	Links      []Link     `json:"links"`
+	Multigraph bool	      `json:"mulitgraph"`
 }
 
 var graph Graph
