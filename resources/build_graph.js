@@ -9,6 +9,8 @@ app.directive('buildGraph', function () {
 			.attr("height", "1000");
 
 		scope.$watch('graph', function(d) {
+			console.log ("watch triggered");
+
 			if (!d || !d.columns || !d.links_list) return;
 
 			var column = canvas.selectAll(".column")
@@ -70,6 +72,28 @@ app.directive('buildGraph', function () {
 
 	function controller($scope, $http, graphService) {
 		$scope.graph = graphService.get_graph();
+
+		if (window["WebSocket"]) {
+			conn = new WebSocket("ws://localhost:8080/ws");
+			conn.onclose = function(evt) {
+				console.log("Connection closed")
+			}
+			conn.onmessage = function(evt) {
+				message = JSON.parse(evt.data);
+				console.log(message.id);
+				console.log(message.status);
+
+				console.log("New Status");
+
+				var node = graphService.find_node_in_graph($scope.graph, message.id);
+				console.log(node);
+				node.class = message.status;
+				console.log(node);
+			}
+		}
+		else {
+			console.log("Your browser does not support WebSockets.")
+		}
 	};
 
 	return {
@@ -95,28 +119,40 @@ app.factory('graphService', function($http) {
 	var find_node_in_columns = function(id) {
 		for (var i = 0; i < columns.length; i++)
 			for (var j = 0; j < columns[i].length; j++)
-			if (columns[i][j].id == id)
-				return columns[i][j];
+				if (columns[i][j].id == id)
+					return columns[i][j];
 		return null;
 	};
 
 	var get_node_column_number = function (id) {
 		for (var i = 0; i < columns.length; i++)
 			for (var j = 0; j < columns[i].length; j++)
-			if (columns[i][j].id == id)
-				return i;
+				if (columns[i][j].id == id)
+					return i;
 		return null;
 	};
 
 	var get_node_row_number = function (id) {
 		for (var i = 0; i < columns.length; i++)
 			for (var j = 0; j < columns[i].length; j++)
-			if (columns[i][j].id == id)
-				return j;
+				if (columns[i][j].id == id)
+					return j;
 		return null;
 	};
 
 	var factory = {};
+
+	factory.find_node_in_graph = function (graph, id) {
+		if (!graph || !graph.columns || !id)
+			return null;
+
+		for (var i = 0; i < graph.columns.length; i++)
+			for (var j = 0; j < graph.columns[i].length; j++)
+				if (graph.columns[i][j].id == id)
+					return graph.columns[i][j];
+
+		return null;
+	}
 
 	factory.get_graph = function() {
 		var graph = {}; 
@@ -156,24 +192,3 @@ app.factory('graphService', function($http) {
 
 	return factory;
  });
-
-if (window["WebSocket"]) {
-	conn = new WebSocket("ws://localhost:8080/ws");
-	conn.onclose = function(evt) {
-		console.log("Connection closed")
-	}
-	conn.onmessage = function(evt) {
-		message = JSON.parse(evt.data);
-		console.log(message.id);
-		console.log(message.status);
-
-		// TODO: use a map to speed up access to nodes.
-		var node = find_node_in_columns(message.id);
-		node.class = message.status;
-		console.log("New Status: " + node.class);
-		console.log(node);
-	}
-}
-else {
-	console.log("Your browser does not support WebSockets.")
-}
