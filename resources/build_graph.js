@@ -2,17 +2,11 @@ var conn;
 
 var app = angular.module('buildStatusMonitor', []);
 
-
 app.directive('buildGraph', function () {
 	function link(scope, element, attr) {
-		console.log(scope);
-
 		var canvas = d3.select(element[0]).append("svg")
 			.attr("width", "1000")
 			.attr("height", "1000");
-
-		var tree = d3.layout.tree()
-			.size([1000, 1000]);
 
 		scope.$watch('graph', function(d) {
 			if (!d || !d.columns || !d.links_list) return;
@@ -71,16 +65,11 @@ app.directive('buildGraph', function () {
 				.append("path")
 				.attr("class", "edge no-builds")
 				.attr("d", diagonal);
-
-			console.log("update");
 		}, true);
 	};
 
 	function controller($scope, $http, graphService) {
-		console.log(graphService);
 		$scope.graph = graphService.get_graph();
-
-		console.log($scope);
 	};
 
 	return {
@@ -152,10 +141,7 @@ app.factory('graphService', function($http) {
 						source: find_node_in_columns(data[i].target),
 						target: find_node_in_columns(data[i].source)
 					};
-					console.log(links_list);
 				}
-				console.log(links_list);
-
 				graph.link = links;
 				graph.links_list = links_list;
 			}).error(function(err){
@@ -168,8 +154,6 @@ app.factory('graphService', function($http) {
 		return graph
 	}
 
-	console.log("Factory instanciated");
-	console.log(factory);
 	return factory;
  });
 
