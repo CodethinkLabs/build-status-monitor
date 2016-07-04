@@ -3,15 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"encoding/json"
 
 	"github.com/streadway/amqp"
 )
-
-type Message struct {
-	ID	int       `json:"id"`
-	Status string `json:"status"`
-}
 
 func failOnError(err error, msg string) {
 	if err != nil {
@@ -30,12 +24,12 @@ func listenForMessages(h *hub) {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"hello", // name
-		false,   // durable
-		false,   // delete when usused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		"build-status", // name
+		false,          // durable
+		false,          // delete when usused
+		false,          // exclusive
+		false,          // no-wait
+		nil,            // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
@@ -54,23 +48,8 @@ func listenForMessages(h *hub) {
 
 	go func() {
 		for d := range msgs {
-			pend_message := Message{ 2, "succeeded"}
-			log.Printf("struct:", pend_message)
-			enc_message, enc_err := json.Marshal(pend_message)
-			log.Printf("Encoded:", enc_message)
-			if (enc_err != nil) {
-				log.Fatal(enc_err)
-			}
-
-			h.broadcast <- enc_message
 			log.Printf("Received a message: %s", d.Body)
-
-			var dec_message Message
-			dec_err := json.Unmarshal(enc_message, &dec_message)
-			if (dec_err != nil) {
-				log.Fatal(dec_err)
-			}
-			log.Printf("decoded:", dec_message)
+			h.broadcast <- d.Body
 		}
 	}()
 

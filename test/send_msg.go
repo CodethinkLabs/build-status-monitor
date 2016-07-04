@@ -3,9 +3,15 @@ package main
 import (
 	"fmt"
 	"log"
+	"encoding/json"
 
 	"github.com/streadway/amqp"
 )
+
+type Message struct {
+	ID	int       `json:"id"`
+	Status string `json:"status"`
+}
 
 func failOnError(err error, msg string) {
 	if err != nil {
@@ -24,16 +30,23 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"hello", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		"build-status", // name
+		false,          // durable
+		false,          // delete when unused
+		false,          // exclusive
+		false,          // no-wait
+		nil,            // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	body := "test"
+	var node_id int
+	if _, err = fmt.Scan(&node_id); err != nil {
+		log.Print(err)
+	}
+	pend_message := Message{node_id, "succeeded"}
+	enc_message, err := json.Marshal(pend_message)
+	failOnError(err, "Failed to serialise message")
+
 	err = ch.Publish(
 		"",     // exchange
 		q.Name, // routing key
@@ -41,8 +54,9 @@ func main() {
 		false,  // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        []byte(enc_message),
 		})
-	log.Printf(" [x] Sent %s", body)
+
+	log.Printf(" [x] Sent %s", enc_message)
 	failOnError(err, "Failed to publish a message")
 }
