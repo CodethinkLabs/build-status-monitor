@@ -80,17 +80,21 @@ app.directive("buildGraph", function () {
 				console.log("Connection closed")
 			}
 			conn.onmessage = function(evt) {
-				message = JSON.parse(evt.data);
-				console.log(message.id);
-				console.log(message.status);
-
-				console.log("New Status");
+				try {
+					message = JSON.parse(evt.data);
+				} catch(e) {
+					console.log(e);
+					return;
+				}
 
 				var node = graphService.find_node_in_graph(message.id);
-				console.log(node);
+				if (node == null) {
+					console.log ("Could not find node with ID: " + message.id);
+					return;
+				}
+
 				node.class = message.status;
 				$scope.$apply();
-				console.log(node);
 			}
 		}
 		else {
