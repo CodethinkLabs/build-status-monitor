@@ -152,7 +152,7 @@ app.service('graphService', function($http) {
 	obj.initialised = false;
 
 	obj.find_node_in_graph = function (id) {
-		if (!id || ! obj.initialised)
+		if (!id || id == null || !obj.initialised)
 			return null;
 
 		for (var i = 0; i < obj.graph.columns.length; i++)
