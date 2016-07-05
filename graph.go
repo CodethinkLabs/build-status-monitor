@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"errors"
-	"encoding/json"
-	"io/ioutil"
-
 	"net/http"
+	"io/ioutil"
+	"encoding/json"
 )
 
 type Node struct {
@@ -159,7 +158,6 @@ func parse_graph_json(file_path string) {
 }
 
 func ColumnsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Columns handler triggered")
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(columns); err != nil {
@@ -168,8 +166,16 @@ func ColumnsHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func NodesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(graph.Nodes); err != nil {
+		panic(err)
+	}
+	return
+}
+
 func LinksHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("Links handler triggered")
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(graph.Links); err != nil {

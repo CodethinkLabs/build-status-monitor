@@ -22,6 +22,7 @@ func main() {
 	homeTempl = template.Must(template.ParseFiles(filepath.Join("index.html")))
 
 	r.HandleFunc("/columns/", ColumnsHandler)
+	r.HandleFunc("/nodes/", NodesHandler)
 	r.HandleFunc("/links/", LinksHandler)
 	r.HandleFunc("/", homeHandler)
 	r.Handle("/ws", wsHandler{h: h})
