@@ -67,7 +67,8 @@ app.directive("buildGraph", function () {
 	};
 
 	function controller($scope, $http, graphService) {
-		$scope.graph = graphService.get_graph();
+		$scope.graph = graphService.graph;
+		graphService.init();
 
 		$scope.node_height = graphService.node_height;
 		$scope.node_width = graphService.node_width;
@@ -142,6 +143,9 @@ app.service('graphService', function($http) {
 
 	obj.canvas_pad = 30;
 
+	obj.graph = {};
+	obj.initialised = false;
+
 	obj.find_node_in_graph = function (graph, id) {
 		if (!graph || !graph.columns || !id)
 			return null;
@@ -154,8 +158,11 @@ app.service('graphService', function($http) {
 		return null;
 	}
 
-	obj.get_graph = function() {
-		var graph = {}; 
+	obj.init = function() {
+		if (obj.initialised) {
+			console.log("Graph is already initialised");
+			return;
+		}
 
 		$http.get('/columns/').success(function(data){
 			columns = data;
@@ -167,7 +174,7 @@ app.service('graphService', function($http) {
 						(obj.node_height + obj.node_y_pad) + obj.canvas_pad;
 				}
 			}
-			graph.columns = columns;
+			obj.graph.columns = columns;
 
 			$http.get('/links/').success(function(data){
 				links = data;
@@ -180,8 +187,8 @@ app.service('graphService', function($http) {
 						target: find_node_in_columns(data[i].source)
 					};
 				}
-				graph.link = links;
-				graph.links_list = links_list;
+				obj.graph.link = links;
+				obj.graph.links_list = links_list;
 			}).error(function(err){
 				throw err;
 			});
@@ -189,7 +196,7 @@ app.service('graphService', function($http) {
 			throw err;
 		});	
 
-		return graph
+		obj.initialised = true;
 	}
 
 	return obj;
