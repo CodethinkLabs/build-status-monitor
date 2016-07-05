@@ -1,18 +1,24 @@
 package main
 
 import (
-	"bufio"
+	"os"
 	"fmt"
 	"log"
-	"os"
+	"bufio"
+	"net/http"
 	"encoding/json"
-
 	"github.com/streadway/amqp"
 )
 
 type Message struct {
 	ID	int       `json:"id"`
 	Status string `json:"status"`
+}
+
+type Node struct {
+	Name  string `json:"name"`
+	ID	  int    `json:"id"`
+	Class string `json:"class"`
 }
 
 func failOnError(err error, msg string) {
@@ -41,8 +47,26 @@ func main() {
 	)
 	failOnError(err, "Failed to declare a queue")
 
-	var node_id int
+	request, err := http.NewRequest("GET", "http://localhost:8080/nodes/", nil)
+	failOnError(err, "Failed to create HTTP request")
+	client := &http.Client{}
+	response, err := client.Do(request)
+
+	failOnError(err, "Failed to execute request")
+
+	var nodes []Node
+	if err := json.NewDecoder(response.Body).Decode(&nodes); err != nil {
+		failOnError(err, "Failed to decode response")
+	}
+
+	fmt.Print("\n")
+	for _, node := range nodes {
+		fmt.Printf("ID: %d\tName: %s\n", node.ID, node.Name)
+	}
+	fmt.Print("\n")
 	fmt.Print("Enter Node ID: ")
+
+	var node_id int
 	if _, err = fmt.Scan(&node_id); err == nil {
 		pend_message := Message{node_id, "succeeded"}
 		enc_message, err := json.Marshal(pend_message)
