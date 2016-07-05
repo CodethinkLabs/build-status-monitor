@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
+	"os"
 	"encoding/json"
 
 	"github.com/streadway/amqp"
@@ -40,23 +42,29 @@ func main() {
 	failOnError(err, "Failed to declare a queue")
 
 	var node_id int
-	if _, err = fmt.Scan(&node_id); err != nil {
-		log.Print(err)
+	fmt.Print("Enter Node ID: ")
+	if _, err = fmt.Scan(&node_id); err == nil {
+		pend_message := Message{node_id, "succeeded"}
+		enc_message, err := json.Marshal(pend_message)
+		failOnError(err, "Failed to serialise message")
+
+		err = ch.Publish(
+			"",     // exchange
+			q.Name, // routing key
+			false,  // mandatory
+			false,  // immediate
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        []byte(enc_message),
+			})
+
+		log.Printf(" [x] Sent %s", enc_message)
+		failOnError(err, "Failed to publish a message")
+	} else {
+		// Consume remainder of input on failure
+		stdin := bufio.NewReader(os.Stdin)
+		stdin.ReadString('\n')
+
+		fmt.Printf("Error: %v\n", err)
 	}
-	pend_message := Message{node_id, "succeeded"}
-	enc_message, err := json.Marshal(pend_message)
-	failOnError(err, "Failed to serialise message")
-
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(enc_message),
-		})
-
-	log.Printf(" [x] Sent %s", enc_message)
-	failOnError(err, "Failed to publish a message")
 }
