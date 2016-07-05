@@ -25,8 +25,7 @@ app.directive("buildGraph", function () {
 					return "node " + d.class;
 				})
 				.attr("transform", function (d, i) {
-					return "translate(" + d.x
-					+ "," + d.y + ")"
+					return "translate(" + d.x + "," + d.y + ")"
 				});
 
 			node.append("rect")
@@ -173,10 +172,12 @@ app.service('graphService', function($http) {
 			columns = data;
 			for (var x = 0; x < columns.length; x++) {
 				for (var y = 0; y < columns[x].length; y++) {
-					columns[x][y].x = x *
-						(obj.node_width + obj.node_x_pad) + obj.canvas_pad;
-					columns[x][y].y = y *
-						(obj.node_height + obj.node_y_pad) + obj.canvas_pad;
+					columns[x][y].x = x
+						* (obj.node_width + obj.node_x_pad)
+						+ obj.canvas_pad;
+					columns[x][y].y = y
+						* (obj.node_height + obj.node_y_pad)
+						+ obj.canvas_pad;
 				}
 			}
 			obj.graph.columns = columns;
