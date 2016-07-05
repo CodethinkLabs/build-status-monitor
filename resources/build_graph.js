@@ -9,8 +9,6 @@ app.directive("buildGraph", function () {
 			.attr("height", "1000");
 
 		scope.$watch("graph", function(d) {
-			console.log ("watch triggered");
-
 			if (!d || !d.columns || !d.links_list) return;
 
 			var column = canvas.selectAll(".column")
