@@ -1,14 +1,14 @@
 var conn;
 
-var app = angular.module('buildStatusMonitor', []);
+var app = angular.module("buildStatusMonitor", []);
 
-app.directive('buildGraph', function () {
+app.directive("buildGraph", function () {
 	function link(scope, element, attr) {
 		var canvas = d3.select(element[0]).append("svg")
 			.attr("width", "1000")
 			.attr("height", "1000");
 
-		scope.$watch('graph', function(d) {
+		scope.$watch("graph", function(d) {
 			console.log ("watch triggered");
 
 			if (!d || !d.columns || !d.links_list) return;
@@ -33,8 +33,8 @@ app.directive('buildGraph', function () {
 				});
 
 			node.append("rect")
-				.attr("height", 40)
-				.attr("width", 180)
+				.attr("height", scope.node_height)
+				.attr("width", scope.node_width)
 				.attr("rx", 5)
 				.attr("ry", 5);
 
@@ -47,14 +47,14 @@ app.directive('buildGraph', function () {
 			var diagonal = d3.svg.diagonal()
 				.source(function (d) {
 					return {
-						x: (d.source.y + (40 / 2)),
+						x: (d.source.y + (scope.node_height / 2)),
 						y: (d.source.x)
 					};
 				})
 				.target(function (d) {
 					return {
-						x: (d.target.y + (40 / 2)),
-						y: (d.target.x + 180)
+						x: (d.target.y + (scope.node_height / 2)),
+						y: (d.target.x + scope.node_width)
 					};
 				})
 				.projection(function (d) {
@@ -72,6 +72,9 @@ app.directive('buildGraph', function () {
 
 	function controller($scope, $http, graphService) {
 		$scope.graph = graphService.get_graph();
+
+		$scope.node_height = graphService.node_height;
+		$scope.node_width = graphService.node_width;
 
 		if (window["WebSocket"]) {
 			conn = new WebSocket("ws://localhost:8080/ws");
@@ -105,15 +108,7 @@ app.directive('buildGraph', function () {
 	};
 });
 
-app.factory('graphService', function($http) {
-	var node_width = 180;
-	var node_height = 40;
-
-	var node_x_pad = 80;
-	var node_y_pad = 25;
-
-	var canvas_pad = 30;
-
+app.service('graphService', function($http) {
 	var columns = [];
 	var links_list = [];
 
@@ -141,9 +136,17 @@ app.factory('graphService', function($http) {
 		return null;
 	};
 
-	var factory = {};
+	var obj = {};
 
-	factory.find_node_in_graph = function (graph, id) {
+	obj.node_width = 180;
+	obj.node_height = 40;
+
+	obj.node_x_pad = 80;
+	obj.node_y_pad = 25;
+
+	obj.canvas_pad = 30;
+
+	obj.find_node_in_graph = function (graph, id) {
 		if (!graph || !graph.columns || !id)
 			return null;
 
@@ -155,7 +158,7 @@ app.factory('graphService', function($http) {
 		return null;
 	}
 
-	factory.get_graph = function() {
+	obj.get_graph = function() {
 		var graph = {}; 
 
 		$http.get('/columns/').success(function(data){
@@ -163,9 +166,9 @@ app.factory('graphService', function($http) {
 			for (var x = 0; x < columns.length; x++) {
 				for (var y = 0; y < columns[x].length; y++) {
 					columns[x][y].x = x *
-						(node_width + node_x_pad) + canvas_pad;
+						(obj.node_width + obj.node_x_pad) + obj.canvas_pad;
 					columns[x][y].y = y *
-						(node_height + node_y_pad) + canvas_pad;
+						(obj.node_height + obj.node_y_pad) + obj.canvas_pad;
 				}
 			}
 			graph.columns = columns;
@@ -193,5 +196,5 @@ app.factory('graphService', function($http) {
 		return graph
 	}
 
-	return factory;
+	return obj;
  });
