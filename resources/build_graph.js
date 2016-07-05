@@ -1,5 +1,3 @@
-var conn;
-
 var app = angular.module("buildStatusMonitor", []);
 
 app.directive("buildGraph", function () {
@@ -75,7 +73,7 @@ app.directive("buildGraph", function () {
 		$scope.node_width = graphService.node_width;
 
 		if (window["WebSocket"]) {
-			conn = new WebSocket("ws://localhost:8080/ws");
+			var conn = new WebSocket("ws://localhost:8080/ws");
 			conn.onclose = function(evt) {
 				console.log("Connection closed")
 			}
