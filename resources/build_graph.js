@@ -87,10 +87,7 @@ app.directive("buildGraph", function () {
 				}
 
 				var node = graphService.find_node_in_graph(message.id);
-				if (node == null) {
-					console.log ("Could not find node with ID: " + message.id);
-					return;
-				}
+				if (node == null) return;
 
 				node.class = message.status;
 				$scope.$apply();
@@ -151,14 +148,21 @@ app.service('graphService', function($http) {
 	obj.initialised = false;
 
 	obj.find_node_in_graph = function (id) {
-		if (!id || id == null || !obj.initialised)
+		if (!id || id == null) {
+			console.log("Could not find node: Null or undefined ID");
 			return null;
+		}
+		if (!obj.initialised) {
+			console.log("Could not find node: Graph not initialised");
+			return null;
+		}
 
 		for (var i = 0; i < obj.graph.columns.length; i++)
 			for (var j = 0; j < obj.graph.columns[i].length; j++)
 				if (obj.graph.columns[i][j].id == id)
 					return obj.graph.columns[i][j];
 
+		console.log("Could not find node with ID: " + id);
 		return null;
 	}
 
