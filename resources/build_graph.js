@@ -7,7 +7,8 @@ app.directive("buildGraph", function () {
 			.attr("height", "1000");
 
 		scope.$watch("graph", function(d) {
-			if (!d || !d.columns || !d.links_list) return;
+			if (!d || !d.columns || !d.links_list)
+				return;
 
 			var column = canvas.selectAll(".column")
 				.data(scope.graph.columns)
@@ -85,7 +86,7 @@ app.directive("buildGraph", function () {
 
 				console.log("New Status");
 
-				var node = graphService.find_node_in_graph($scope.graph, message.id);
+				var node = graphService.find_node_in_graph(message.id);
 				console.log(node);
 				node.class = message.status;
 				$scope.$apply();
@@ -146,14 +147,14 @@ app.service('graphService', function($http) {
 	obj.graph = {};
 	obj.initialised = false;
 
-	obj.find_node_in_graph = function (graph, id) {
-		if (!graph || !graph.columns || !id)
+	obj.find_node_in_graph = function (id) {
+		if (!id || ! obj.initialised)
 			return null;
 
-		for (var i = 0; i < graph.columns.length; i++)
-			for (var j = 0; j < graph.columns[i].length; j++)
-				if (graph.columns[i][j].id == id)
-					return graph.columns[i][j];
+		for (var i = 0; i < obj.graph.columns.length; i++)
+			for (var j = 0; j < obj.graph.columns[i].length; j++)
+				if (obj.graph.columns[i][j].id == id)
+					return obj.graph.columns[i][j];
 
 		return null;
 	}
