@@ -27,7 +27,7 @@ app.directive("buildGraph", function () {
 				.attr("class", function(d) {
 					return "node " + d.class;
 				})
-				.attr("transform", function (d, i) {
+				.attr("transform", function(d, i) {
 					return "translate(" + d.x + "," + d.y + ")"
 				});
 
@@ -38,25 +38,36 @@ app.directive("buildGraph", function () {
 				.attr("ry", 5);
 
 			node.append("text")
-				.text(function (d) { return d.name; })
+				.text(function(d) { return d.name; })
 				.attr("transform", function(d) {
-					return "translate(6, 20)";
+					return "translate(3, 20)";
+				})
+				.each(function(d) {
+					var self = d3.select(this),
+						textLength = self.node().getComputedTextLength(),
+						text = d.name;
+					while ((textLength > (scope.node_width - 3))
+						&& text.length > 0) {
+						text = text.slice(0, -1);
+						self.text(text + '...');
+						textLength = self.node().getComputedTextLength();
+					}
 				})
 
 			var diagonal = d3.svg.diagonal()
-				.source(function (d) {
+				.source(function(d) {
 					return {
 						x: (d.source.y + (scope.node_height / 2)),
 						y: (d.source.x)
 					};
 				})
-				.target(function (d) {
+				.target(function(d) {
 					return {
 						x: (d.target.y + (scope.node_height / 2)),
 						y: (d.target.x + scope.node_width)
 					};
 				})
-				.projection(function (d) {
+				.projection(function(d) {
 					return [d.y, d.x];
 				});
 
