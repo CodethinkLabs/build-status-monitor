@@ -8,9 +8,24 @@ import (
 	"encoding/json"
 )
 
+type Status struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+var statuses = [...]Status {
+	Status{0, "succeeded"},
+	Status{1, "no-builds"},
+	Status{2, "failed"   },
+	Status{3, "pending"  },
+	Status{4, "errored"  },
+	Status{5, "paused"   },
+	Status{6, "aborted"  },
+}
+
 type Node struct {
-	Name  string `json:"name"`
 	ID	  int    `json:"id"`
+	Name  string `json:"name"`
 	Class string `json:"class"`
 }
 
@@ -37,7 +52,6 @@ func find_node_in_graph (id int) (*Node, error) {
 	}
 	return nil, errors.New("No node in graph with ID")
 }
-
 
 var columns = [][]Node{}
 
@@ -155,6 +169,15 @@ func parse_graph_json(file_path string) {
 	
 	fmt.Printf("Graph Nodes: %v\n",	graph.Nodes)
 
+}
+
+func StatusesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(statuses); err != nil {
+		panic(err)
+	}
+	return
 }
 
 func ColumnsHandler(w http.ResponseWriter, r *http.Request) {

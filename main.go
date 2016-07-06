@@ -21,6 +21,7 @@ func main() {
 	r := mux.NewRouter()
 	homeTempl = template.Must(template.ParseFiles(filepath.Join("index.html")))
 
+	r.HandleFunc("/statuses/", StatusesHandler)
 	r.HandleFunc("/columns/", ColumnsHandler)
 	r.HandleFunc("/nodes/", NodesHandler)
 	r.HandleFunc("/links/", LinksHandler)
