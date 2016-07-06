@@ -109,7 +109,7 @@ app.directive("buildGraph", function () {
 	};
 });
 
-app.service('graphService', function($http) {
+app.service('graphService', function($http, $q) {
 	var columns = [];
 	var links_list = [];
 
@@ -175,7 +175,7 @@ app.service('graphService', function($http) {
 			return;
 		}
 
-		$http.get('/columns/').success(function(data){
+		var columns_promise = $http.get('/columns/').success(function(data){
 			columns = data;
 			for (var x = 0; x < columns.length; x++) {
 				for (var y = 0; y < columns[x].length; y++) {
@@ -188,28 +188,38 @@ app.service('graphService', function($http) {
 				}
 			}
 			obj.graph.columns = columns;
-
-			$http.get('/links/').success(function(data){
-				links = data;
-				links_list = [];
-				for (var i = 0; i < data.length; i++) {
-					// Append object references to link list.
-					// Flip source and target as they are backwards in the json.
-					links_list[links_list.length] = {
-						source: find_node_in_columns(data[i].target),
-						target: find_node_in_columns(data[i].source)
-					};
-				}
-				obj.graph.link = links;
-				obj.graph.links_list = links_list;
-			}).error(function(err){
-				throw err;
-			});
 		}).error(function(err){
 			throw err;
-		});	
+		});
 
-		obj.initialised = true;
+		var links_promise = $http.get('/links/').success(function(data){
+			links = data;
+			links_list = [];
+			for (var i = 0; i < data.length; i++) {
+				// Append object references to link list.
+				// Flip source and target as they are backwards in the json.
+				links_list[links_list.length] = {
+					source: find_node_in_columns(data[i].target),
+					target: find_node_in_columns(data[i].source)
+				};
+			}
+			obj.graph.link = links;
+			obj.graph.links_list = links_list;
+		}).error(function(err){
+			throw err;
+		});
+
+		var statuses_promise = $http.get('/statuses/').success(function(data){
+			obj.statuses = data;
+		}).error(function(err){
+			throw err;
+		});
+
+		$q.all([columns_promise]).then(function(){
+			$q.all([links_promise, statuses_promise]).then(function(){
+				obj.initialised = true;
+			});
+		});
 	}
 
 	return obj;
