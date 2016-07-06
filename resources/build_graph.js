@@ -10,6 +10,9 @@ app.directive("buildGraph", function () {
 			if (!d || !d.columns || !d.links_list)
 				return;
 
+			// TODO - Only change specific nodes rather than redraw
+			canvas.selectAll("*").remove();
+
 			var column = canvas.selectAll(".column")
 				.data(scope.graph.columns)
 				.enter()
