@@ -5,15 +5,27 @@ body, pre {
 body {
     font-weight: 600;
     font-size: 1.2em;
-    line-height: 1.4;
     margin: 0;
     background: #273747;
     color: #E6E7E8;
 }
 
-h1 {
-    font-size: 1.5em;
-    padding-left: 30px;
+.pageheading {
+	background: #172737;
+	height: 30px;
+	padding: 5px;
+	padding-top: 15px;
+	border: solid;
+	border-width: 0px;
+	border-bottom-width: 4px;
+	border-bottom-color: #011121;
+
+}
+
+.pageheading h1 {
+	margin: 0;
+    font-size: 1.4em;
+    padding-left: 25px;
 }
 
 svg .node.pending rect {
@@ -54,6 +66,5 @@ svg .edge {
 }
 
 .node text {
-    font-size: 1em;
     fill: #fff;
 }
