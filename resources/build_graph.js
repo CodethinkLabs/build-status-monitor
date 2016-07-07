@@ -207,7 +207,6 @@ app.service('graphService', function($http, $q) {
 			links = data;
 			links_list = [];
 			for (var i = 0; i < data.length; i++) {
-				// Append object references to link list.
 				// Flip source and target as they are backwards in the json.
 				links_list[links_list.length] = {
 					source: find_node_in_columns(data[i].target),
@@ -221,7 +220,20 @@ app.service('graphService', function($http, $q) {
 		});
 
 		var statuses_promise = $http.get('/statuses/').success(function(data){
-			obj.statuses = data;
+			obj.statuses = [];
+			for (var i = 0; i < data.length; i++) {
+				var status = data[i];
+				if (!status.hasOwnProperty("id")
+					|| !status.hasOwnProperty("name")){
+					console.log("Error: Invalid status recieved from API");
+					console.log(status);
+				}
+				if (!obj.statuses[status.id]) {
+					obj.statuses[status.id] = status.name
+				} else {
+					console.log("Error: Duplicate status ID(" + status.id + ")");
+				}
+			}
 		}).error(function(err){
 			throw err;
 		});
