@@ -12,6 +12,10 @@ import (
 
 var home_templ *template.Template
 
+func homeHandler(c http.ResponseWriter, req *http.Request) {
+	home_templ.Execute(c, req.Host)
+}
+
 func main() { 
 	flag.Parse()
 
@@ -42,5 +46,4 @@ func main() {
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
-
 }

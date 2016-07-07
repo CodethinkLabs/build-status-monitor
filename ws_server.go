@@ -1,29 +1,34 @@
 package main
 
 import (
-	"github.com/gorilla/websocket"
 	"net/http"
-	"log"
-	"time"
+	"github.com/gorilla/websocket"
 )
 
-func homeHandler(c http.ResponseWriter, req *http.Request) {
-	home_templ.Execute(c, req.Host)
+type connection struct {
+	send chan []byte
+
+	ws *websocket.Conn
+	h  *hub
 }
 
 type hub struct {
 	connections map[*connection]bool
 
-	broadcast	chan []byte
-	register	chan *connection
+	broadcast  chan []byte
+	register   chan *connection
 	unregister chan *connection
+}
+
+type wsHandler struct {
+	h *hub
 }
 
 func newHub() *hub {
 	return &hub{
-		broadcast:	make(chan []byte),
-		register:	make(chan *connection),
-		unregister:	make(chan *connection),
+		broadcast:   make(chan []byte),
+		register:    make(chan *connection),
+		unregister:  make(chan *connection),
 		connections: make(map[*connection]bool),
 	}
 }
@@ -51,13 +56,6 @@ func (h *hub) run() {
 	}
 }
 
-type connection struct {
-	send chan []byte
-
-	ws *websocket.Conn
-	h	*hub
-}
-
 func (c *connection) reader() {
 	for {
 		_, message, err := c.ws.ReadMessage()
@@ -82,19 +80,6 @@ func (c *connection) writer() {
 var upgrader = &websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool { return true },
 	ReadBufferSize: 1024, WriteBufferSize: 1024,
-}
-
-type wsHandler struct {
-	h *hub
-}
-
-func (h *hub) send_test() {
-	for {
-		// TODO: Only send test string if clients are connected.
-		h.broadcast <- []byte("Test from go")
-		log.Printf("Sent a message to web page")
-		time.Sleep(time.Second * 5)
-	}
 }
 
 func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
