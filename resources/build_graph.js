@@ -120,6 +120,17 @@ app.directive("buildGraph", function () {
 	};
 });
 
+app.controller("keyController", function($scope, graphService) {
+	function activate() {
+		return graphService.get_statuses().then(function() {
+			$scope.statuses = graphService.graph.statuses;
+			return $scope.statuses;
+		});
+	}
+
+	activate();
+});
+
 app.service('graphService', function($http, $q) {
 	var columns = [];
 	var links_list = [];

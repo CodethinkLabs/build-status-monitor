@@ -11,7 +11,7 @@ body {
 }
 
 .pageheading {
-	background: #172737;
+	background: #182B3E;
 	height: 30px;
 	padding: 5px;
 	padding-top: 15px;
@@ -19,7 +19,7 @@ body {
 	border-width: 0px;
 	border-bottom-width: 4px;
 	border-bottom-color: #011121;
-
+	white-space: nowrap;;
 }
 
 .pageheading h1 {
@@ -28,30 +28,78 @@ body {
     padding-left: 25px;
 }
 
+.graphkey {
+	background: #3E5164;
+	width: 100%;
+	height: 12px;
+	padding: 5px;
+	white-space: nowrap;
+}
+
+.keyelem {
+	float: left;
+	font-size: 0.7em;
+	width: auto;
+	margin-left: 12px;
+}
+
+.keyelem.text {
+	float: left;
+}
+
+.keyicon {
+	float: left;
+	height: 10px;
+	width: 10px;
+	margin-right: 5px;
+	margin-top: 1px;
+}
+
+.keyicon.pending {
+	background: #BDC3C7;
+}
 svg .node.pending rect {
     fill: #BDC3C7;
 }
 
+.keyicon.succeeded {
+	background: #2ECC71;
+}
 svg .node.succeeded rect {
-    fill: #2ECC71;
+	fill: #2ECC71;
 }
 
+.keyicon.failed {
+	background: #E74C3C;
+}
 svg .node.failed rect {
     fill: #E74C3C;
 }
 
+.keyicon.errored {
+	background: #E67E22;
+}
 svg .node.errored rect {
     fill: #E67E22;
 }
 
+.keyicon.aborted {
+	background: #8F4B2D;
+}
 svg .node.aborted rect {
     fill: #8F4B2D;
 }
 
+.keyicon.paused {
+	background: #3498DB;
+}
 svg .node.paused rect {
     fill: #3498DB;
 }
 
+.keyicon.no-builds {
+	background: #5D6D7E;
+}
 svg .node.no-builds rect {
     fill: #5D6D7E;
 }

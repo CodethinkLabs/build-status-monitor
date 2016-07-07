@@ -8,7 +8,7 @@ import (
 )
 
 func homeHandler(c http.ResponseWriter, req *http.Request) {
-	homeTempl.Execute(c, req.Host)
+	home_templ.Execute(c, req.Host)
 }
 
 type hub struct {

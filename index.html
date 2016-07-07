@@ -17,6 +17,15 @@
 	<div class="pageheading">
 		<h1>Build Status Monitor</h1>
 	</div>
+
+	<div class="graphkey" ng-controller="keyController">
+		<div ng-repeat="status in statuses" class="keyelem">
+			<div class="keyicon {{status}}"></div>
+			<text>{{status}}</text>
+		</div>
+	</div>
+
+
 	<build-graph></build-graph>
 
 </body>

@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var homeTempl *template.Template
+var home_templ *template.Template
 
 func main() { 
 	flag.Parse()
@@ -19,7 +19,9 @@ func main() {
 
 	h := newHub()
 	r := mux.NewRouter()
-	homeTempl = template.Must(template.ParseFiles(filepath.Join("index.html")))
+
+	home_templ = template.New("index.html").Delims("<<", ">>")
+	home_templ, _ = home_templ.ParseFiles(filepath.Join("index.html"))
 
 	r.HandleFunc("/statuses/", StatusesHandler)
 	r.HandleFunc("/columns/", ColumnsHandler)
