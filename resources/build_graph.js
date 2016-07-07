@@ -7,7 +7,7 @@ app.directive("buildGraph", function () {
 			.attr("height", "1000");
 
 		scope.$watch("graph", function(d) {
-			if (!d || !d.columns || !d.links_list)
+			if (!d || !d.columns || !d.links_list || !d.statuses)
 				return;
 
 			// TODO - Only change specific nodes rather than redraw
@@ -25,7 +25,7 @@ app.directive("buildGraph", function () {
 				.enter()
 				.append("g")
 				.attr("class", function(d) {
-					return "node " + d.class;
+					return "node " + scope.graph.statuses[d.status];
 				})
 				.attr("transform", function(d, i) {
 					return "translate(" + d.x + "," + d.y + ")"
@@ -103,7 +103,7 @@ app.directive("buildGraph", function () {
 				var node = graphService.find_node_in_graph(message.id);
 				if (node == null) return;
 
-				node.class = message.status;
+				node.status = message.status;
 				$scope.$apply();
 			}
 		}
@@ -220,7 +220,7 @@ app.service('graphService', function($http, $q) {
 		});
 
 		var statuses_promise = $http.get('/statuses/').success(function(data){
-			obj.statuses = [];
+			obj.graph.statuses = [];
 			for (var i = 0; i < data.length; i++) {
 				var status = data[i];
 				if (!status.hasOwnProperty("id")
@@ -228,8 +228,8 @@ app.service('graphService', function($http, $q) {
 					console.log("Error: Invalid status recieved from API");
 					console.log(status);
 				}
-				if (!obj.statuses[status.id]) {
-					obj.statuses[status.id] = status.name
+				if (!obj.graph.statuses[status.id]) {
+					obj.graph.statuses[status.id] = status.name
 				} else {
 					console.log("Error: Duplicate status ID(" + status.id + ")");
 				}

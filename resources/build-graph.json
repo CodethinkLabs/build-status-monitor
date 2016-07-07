@@ -2,16 +2,16 @@
     "directed": true,
     "graph": [["name", "gnm_random_graph(10,5)"]],
     "nodes": [
-        {"name": "1080", "id": 0, "class": "succeeded"},
-        {"name": "bombic", "id": 1, "class": "succeeded"},
-        {"name": "cyanicide", "id": 2, "class": "no-builds"},
-        {"name": "fishbone", "id": 3, "class": "succeeded"},
-        {"name": "impossibilification", "id": 4, "class": "failed"},
-        {"name": "merostomatous", "id": 5, "class": "pending"},
-        {"name": "packplane", "id": 6, "class": "errored"},
-        {"name": "raying", "id": 7, "class": "succeeded"},
-        {"name": "sortilegious", "id": 8, "class": "paused"},
-        {"name": "two-speed", "id": 9, "class": "aborted"}
+        {"name": "1080", "id": 0, "status": 0},
+        {"name": "bombic", "id": 1, "status": 0},
+        {"name": "cyanicide", "id": 2, "status": 1},
+        {"name": "fishbone", "id": 3, "status": 0},
+        {"name": "impossibilification", "id": 4, "status": 2},
+        {"name": "merostomatous", "id": 5, "status": 3},
+        {"name": "packplane", "id": 6, "status": 4},
+        {"name": "raying", "id": 7, "status": 0},
+        {"name": "sortilegious", "id": 8, "status": 5},
+        {"name": "two-speed", "id": 9, "status": 6}
    ],
 
    "links": [

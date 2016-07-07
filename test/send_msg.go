@@ -11,8 +11,8 @@ import (
 )
 
 type Message struct {
-	ID	int       `json:"id"`
-	Status string `json:"status"`
+	ID     int `json:"id"`
+	Status int `json:"status"`
 }
 
 type Node struct {
@@ -68,7 +68,7 @@ func main() {
 
 	var node_id int
 	if _, err = fmt.Scan(&node_id); err == nil {
-		pend_message := Message{node_id, "succeeded"}
+		pend_message := Message{node_id, 0}
 		enc_message, err := json.Marshal(pend_message)
 		failOnError(err, "Failed to serialise message")
 

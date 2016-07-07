@@ -26,7 +26,7 @@ var statuses = [...]Status {
 type Node struct {
 	ID	  int    `json:"id"`
 	Name  string `json:"name"`
-	Class string `json:"class"`
+	Status int   `json:"status"`
 }
 
 type Link struct {
