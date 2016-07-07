@@ -12,9 +12,9 @@ body {
 
 .pageheading {
 	background: #182B3E;
-	height: 30px;
+	height: 28px;
 	padding: 5px;
-	padding-top: 15px;
+	padding-top: 13px;
 	border: solid;
 	border-width: 0px;
 	border-bottom-width: 4px;
@@ -25,7 +25,7 @@ body {
 .pageheading h1 {
 	margin: 0;
     font-size: 1.4em;
-    padding-left: 25px;
+    padding-left: 10px;
 }
 
 .graphkey {
@@ -41,6 +41,7 @@ body {
 	font-size: 0.7em;
 	width: auto;
 	margin-left: 12px;
+	color: #D2DDE9;
 }
 
 .keyelem.text {

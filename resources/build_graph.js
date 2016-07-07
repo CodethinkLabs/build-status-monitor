@@ -167,7 +167,7 @@ app.service('graphService', function($http, $q) {
 	obj.node_x_pad = 80;
 	obj.node_y_pad = 25;
 
-	obj.canvas_pad = 30;
+	obj.canvas_pad = 15;
 
 	obj.graph = {};
 	obj.initialised = false;
