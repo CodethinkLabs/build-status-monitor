@@ -180,6 +180,33 @@ app.service('graphService', function($http, $q) {
 		return null;
 	}
 
+	var statuses_promise = null;
+
+	obj.get_statuses = function() {
+		if (statuses_promise == null) {
+			statuses_promise = $http.get('/statuses/').success(function(data){
+				obj.graph.statuses = [];
+				for (var i = 0; i < data.length; i++) {
+					var status = data[i];
+					if (!status.hasOwnProperty("id")
+						|| !status.hasOwnProperty("name")){
+						console.log("Error: Invalid status recieved from API");
+						console.log(status);
+					}
+					if (!obj.graph.statuses[status.id]) {
+						obj.graph.statuses[status.id] = status.name
+					} else {
+						console.log("Error: Duplicate status ID(" + status.id + ")");
+					}
+				}
+			}).error(function(err){
+			throw err;
+			});
+		}
+
+		return statuses_promise;
+	}
+
 	obj.init = function() {
 		if (obj.initialised) {
 			console.log("Graph is already initialised");
@@ -219,27 +246,8 @@ app.service('graphService', function($http, $q) {
 			throw err;
 		});
 
-		var statuses_promise = $http.get('/statuses/').success(function(data){
-			obj.graph.statuses = [];
-			for (var i = 0; i < data.length; i++) {
-				var status = data[i];
-				if (!status.hasOwnProperty("id")
-					|| !status.hasOwnProperty("name")){
-					console.log("Error: Invalid status recieved from API");
-					console.log(status);
-				}
-				if (!obj.graph.statuses[status.id]) {
-					obj.graph.statuses[status.id] = status.name
-				} else {
-					console.log("Error: Duplicate status ID(" + status.id + ")");
-				}
-			}
-		}).error(function(err){
-			throw err;
-		});
-
 		$q.all([columns_promise]).then(function(){
-			$q.all([links_promise, statuses_promise]).then(function(){
+			$q.all([links_promise, obj.get_statuses()]).then(function(){
 				obj.initialised = true;
 			});
 		});
