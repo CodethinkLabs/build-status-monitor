@@ -3,8 +3,11 @@ var app = angular.module("buildStatusMonitor", []);
 app.directive("buildGraph", function () {
 	function link(scope, element, attr) {
 		var canvas = d3.select(element[0]).append("svg")
-			.attr("width", "1000")
+			.attr("width", "100%")
 			.attr("height", "1000");
+
+		var graph_translate = [0, 0];
+		var graph_scale = [1, 1];
 
 		scope.$watch("graph", function(d) {
 			if (!d || !d.columns || !d.links_list || !d.statuses)
@@ -17,6 +20,10 @@ app.directive("buildGraph", function () {
 				.data(scope.graph.columns)
 				.enter()
 				.append("g")
+				.attr("transform", function(d) {
+					return "translate(" + graph_translate
+						+ ") scale(" + graph_scale + ")";
+				})
 
 			var node = column.selectAll(".node")
 				.data( function(d) {
@@ -71,12 +78,33 @@ app.directive("buildGraph", function () {
 					return [d.y, d.x];
 				});
 
-			column.select(".link")
+			var link = column.select(".link")
 				.data(scope.graph.links_list)
 				.enter()
 				.append("path")
 				.attr("class", "edge no-builds")
-				.attr("d", diagonal);
+				.attr("d", diagonal)
+				.attr("transform", function(d) {
+					return "translate(" + graph_translate
+						+ ") scale(" + graph_scale + ")";
+				});
+
+			canvas.on("mousedown", function() {
+				var ev = d3.event;
+				if (ev.button || ev.ctrlKey)
+				ev.stopImmediatePropagation();
+			}).call(d3.behavior.zoom()
+				.scaleExtent([0.5, 10]).on("zoom", function() {
+					var ev = d3.event;
+					graph_translate = ev.translate;
+					graph_scale = ev.scale;
+					column.attr("transform", "translate(" + graph_translate
+						+ ") scale(" + graph_scale + ")");
+					link.attr("transform", "translate(" + graph_translate
+						+ ") scale(" + graph_scale + ")");
+				})
+			);
+
 		}, true);
 	};
 
