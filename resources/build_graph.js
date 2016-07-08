@@ -92,7 +92,7 @@ app.directive("buildGraph", function () {
 			canvas.on("mousedown", function() {
 				var ev = d3.event;
 				if (ev.button || ev.ctrlKey)
-				ev.stopImmediatePropagation();
+					ev.stopImmediatePropagation();
 			}).call(d3.behavior.zoom()
 				.scaleExtent([0.5, 10]).on("zoom", function() {
 					var ev = d3.event;
