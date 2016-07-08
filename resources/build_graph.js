@@ -7,7 +7,7 @@ app.directive("buildGraph", function () {
 			.attr("height", "1000");
 
 		var graph_translate = [0, 0];
-		var graph_scale = [1, 1];
+		var graph_scale = 1;
 
 		scope.$watch("graph", function(d) {
 			if (!d || !d.columns || !d.links_list || !d.statuses)
