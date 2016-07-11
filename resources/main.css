@@ -10,23 +10,55 @@ body {
     color: #E6E7E8;
 }
 
-.pageheading {
+.topbar {
 	background: #182B3E;
-	height: 28px;
-	padding: 5px;
-	padding-top: 13px;
+	height: 30px;
+	width: 100%;
 	border: solid;
 	border-width: 0px;
 	border-bottom-width: 4px;
 	border-bottom-color: #011121;
-	white-space: nowrap;;
 }
 
 .pageheading h1 {
 	margin: 0;
     font-size: 1.4em;
-    padding-left: 10px;
+	margin-top: 4px;
+	margin-left: 15px;
+	float: left;
 }
+
+.socketstatus {
+	float: right;
+	position: relative;
+	padding-right: 5px;
+	width: 120px;
+}
+
+.socketstatus text {
+	position: absolute;
+	font-size: 0.8em;
+	top: 4px;
+	left: 20px;
+}
+
+.connectionicon {
+	position: absolute;
+	top: 4px;
+	left: 0;
+	height: 15px;
+	width: 10px;
+	border-radius: 4px;
+}
+
+.connectionicon.Connected {
+	background-color: green;
+}
+
+.connectionicon.Disconnected {
+	background-color: red;
+}
+
 
 .graphkey {
 	background: #3E5164;

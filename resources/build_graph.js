@@ -152,6 +152,17 @@ app.controller("keyController", function($scope, graphService) {
 	activate();
 });
 
+app.controller("socketController", function($scope, socketService) {
+	$scope.status = socketService.status;
+
+	var update_status = function (status) {
+		$scope.status = status;
+		$scope.$apply();
+	};
+
+	socketService.add_status_handler(update_status);
+});
+
 app.service('graphService', function($http, $q) {
 	var columns = [];
 	var links_list = [];
@@ -290,14 +301,31 @@ app.service('graphService', function($http, $q) {
 
 app.service('socketService', function (){
 	var on_message_handlers = [];
+	var on_status_handlers = [];
+
 	var conn = {};
+
+	var socket_statuses = [
+		"Connected",   // 0
+		"Disconnected" // 1
+	]
 
 	var obj = {};
 
+	function set_socket_status(status) {
+		obj.status = status;
+		for (var i = 0; i < on_status_handlers.length; i++) {
+			on_status_handlers[i](status);
+		}
+	}
+
 	if (window["WebSocket"]) {
 		conn = new WebSocket("ws://localhost:8080/ws");
+
+		set_socket_status(socket_statuses[0]);
+
 		conn.onclose = function(evt) {
-			console.log("Connection closed")
+			set_socket_status(socket_statuses[1]);
 		}
 		conn.onmessage = function(evt) {
 			for (var i = 0; i < on_message_handlers.length; i++) {
@@ -312,6 +340,10 @@ app.service('socketService', function (){
 
 	obj.add_message_handler = function (func) {
 		on_message_handlers[on_message_handlers.length] = func;
+	}
+
+	obj.add_status_handler = function (func) {
+		on_status_handlers[on_status_handlers.length] = func;
 	}
 
 	return obj;

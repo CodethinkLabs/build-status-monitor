@@ -14,8 +14,14 @@
 
 <body ng-app="buildStatusMonitor">
 
-	<div class="pageheading">
-		<h1>Build Status Monitor</h1>
+	<div class="topbar">
+		<div class="pageheading">
+			<h1>Build Status Monitor</h1>
+		</div>
+		<div class="socketstatus" ng-controller="socketController">
+			<div class="connectionicon {{status}}"></div>
+			<text>{{status}}</text>
+		</div>
 	</div>
 
 	<div class="graphkey" ng-controller="keyController">
