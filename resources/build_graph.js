@@ -108,36 +108,29 @@ app.directive("buildGraph", function () {
 		}, true);
 	};
 
-	function controller($scope, $http, graphService) {
+	function controller($scope, $http, graphService, socketService) {
 		$scope.graph = graphService.graph;
 		graphService.init();
 
 		$scope.node_height = graphService.node_height;
 		$scope.node_width = graphService.node_width;
 
-		if (window["WebSocket"]) {
-			var conn = new WebSocket("ws://localhost:8080/ws");
-			conn.onclose = function(evt) {
-				console.log("Connection closed")
+		var update_graph = function(evt) {
+			try {
+				message = JSON.parse(evt.data);
+			} catch(e) {
+				console.log(e);
+				return;
 			}
-			conn.onmessage = function(evt) {
-				try {
-					message = JSON.parse(evt.data);
-				} catch(e) {
-					console.log(e);
-					return;
-				}
 
-				var node = graphService.find_node_in_graph(message.id);
-				if (node == null) return;
+			var node = graphService.find_node_in_graph(message.id);
+			if (node == null) return;
 
-				node.status = message.status;
-				$scope.$apply();
-			}
-		}
-		else {
-			console.log("Your browser does not support WebSockets.")
-		}
+			node.status = message.status;
+			$scope.$apply();
+		};
+
+		socketService.add_message_handler(update_graph);
 	};
 
 	return {
@@ -294,3 +287,32 @@ app.service('graphService', function($http, $q) {
 
 	return obj;
  });
+
+app.service('socketService', function (){
+	var on_message_handlers = [];
+	var conn = {};
+
+	var obj = {};
+
+	if (window["WebSocket"]) {
+		conn = new WebSocket("ws://localhost:8080/ws");
+		conn.onclose = function(evt) {
+			console.log("Connection closed")
+		}
+		conn.onmessage = function(evt) {
+			for (var i = 0; i < on_message_handlers.length; i++) {
+				on_message_handlers[i](evt);
+			}
+		}
+	}
+	else {
+		alert("Your browser does not support WebSockets.")
+		return;
+	}
+
+	obj.add_message_handler = function (func) {
+		on_message_handlers[on_message_handlers.length] = func;
+	}
+
+	return obj;
+});
