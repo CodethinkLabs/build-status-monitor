@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"text/template"
-
 	"github.com/gorilla/mux"
 )
 
