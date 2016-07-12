@@ -205,7 +205,7 @@ app.service('graphService', function($http, $q) {
 	obj.initialised = false;
 
 	obj.find_node_in_graph = function (id) {
-		if (!id || id == null) {
+		if (!(typeof id != "undefined") || id == null) {
 			console.log("Could not find node: Null or undefined ID");
 			return null;
 		}
