@@ -44,7 +44,7 @@ type Graph struct {
 
 var graph Graph
 
-func find_node_in_graph (id int) (*Node, error) {
+func find_node_in_graph(id int) (*Node, error) {
 	for _, node := range graph.Nodes {
 		if (node.ID == id) {
 			return &node, nil
@@ -54,6 +54,18 @@ func find_node_in_graph (id int) (*Node, error) {
 }
 
 var columns = [][]Node{}
+
+func update_node_in_columns(id int, status int) (error) {
+	for i, column := range columns {
+		for j, node := range column {
+			if (node.ID == id) {
+				columns[i][j].Status = status
+				return nil
+			}
+		}
+	}
+	return errors.New("No node in columns with ID")
+}
 
 func get_node_column_number(id int) (int, error) {
 	for i, column := range columns {
@@ -126,7 +138,7 @@ func parse_graph_json(file_path string) {
 		cols_sorted = true
 
 		for _, link := range graph.Links {
-			node_ref, err := find_node_in_graph(link.Target)
+			node, err := find_node_in_graph(link.Target)
 			if (err != nil) {
 				fmt.Printf("Error: %v\n", err)
 				return
@@ -153,12 +165,12 @@ func parse_graph_json(file_path string) {
 
 				new_col := parent_col_num + 1
 
-				err = remove_node_from_columns(node_ref.ID)
+				err = remove_node_from_columns(node.ID)
 				if (err != nil) {
 					fmt.Printf("Error: %v\n", err)
 					return
 				}
-				columns[new_col] = append (columns[new_col], *node_ref)
+				columns[new_col] = append (columns[new_col], *node)
 			}
 		}
 	}
@@ -169,6 +181,13 @@ func parse_graph_json(file_path string) {
 	
 	fmt.Printf("Graph Nodes: %v\n",	graph.Nodes)
 
+}
+
+func update_node_status(id int, status int) {
+	err := update_node_in_columns(id, status)
+	if (err != nil) {
+		fmt.Printf("Update node error: %v\n", err)
+	}
 }
 
 func StatusesHandler(w http.ResponseWriter, r *http.Request) {

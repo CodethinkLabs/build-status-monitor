@@ -3,8 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"encoding/json"
 	"github.com/streadway/amqp"
 )
+
+type Message struct {
+	ID     int `json:"id"`
+	Status int `json:"status"`
+}
 
 func failOnError(err error, msg string) {
 	if err != nil {
@@ -48,6 +54,13 @@ func listenForMessages(h *hub) {
 	go func() {
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
+
+			var rec_message Message
+			err := json.Unmarshal(d.Body, &rec_message)
+			failOnError(err, "Failed to deserialise message")
+
+			update_node_status(rec_message.ID, rec_message.Status)
+
 			h.broadcast <- d.Body
 		}
 	}()
