@@ -297,7 +297,7 @@ app.service('graphService', function($http, $q) {
 	}
 
 	return obj;
- });
+});
 
 app.service('socketService', function (){
 	var on_message_handlers = [];
