@@ -53,7 +53,7 @@ func listenForMessages(h *hub) {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
+			log.Printf(" [x] Received: %s", d.Body)
 
 			var rec_message Message
 			err := json.Unmarshal(d.Body, &rec_message)
