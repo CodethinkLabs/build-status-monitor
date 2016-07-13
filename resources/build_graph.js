@@ -320,7 +320,7 @@ app.service('socketService', function (){
 	}
 
 	if (window["WebSocket"]) {
-		conn = new WebSocket("ws://localhost:8080/ws");
+		conn = new WebSocket("ws://" + location.host + "/ws");
 
 		set_socket_status(socket_statuses[0]);
 
