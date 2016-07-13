@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"github.com/gorilla/websocket"
 )
@@ -89,6 +90,9 @@ func (wsh wsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	c := &connection{send: make(chan []byte, 256), ws: ws, h: wsh.h}
 	c.h.register <- c
+
+	log.Printf(" [x] Client connected: %v", ws.RemoteAddr())
+
 	defer func() { c.h.unregister <- c }()
 	go c.writer()
 	c.reader()
