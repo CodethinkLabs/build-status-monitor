@@ -10,7 +10,8 @@ app.directive("buildGraph", function () {
 		var graph_scale = 1;
 
 		scope.$watch("graph", function(d) {
-			if (!d || !d.columns || !d.links_list || !d.statuses)
+			if (typeof d == "undefined"
+				|| !d.columns || !d.links_list || !d.statuses)
 				return;
 
 			// TODO - Only change specific nodes rather than redraw
@@ -205,7 +206,7 @@ app.service('graphService', function($http, $q) {
 	obj.initialised = false;
 
 	obj.find_node_in_graph = function (id) {
-		if (!(typeof id != "undefined") || id == null) {
+		if (typeof id == "undefined" || id == null) {
 			console.log("Could not find node: Null or undefined ID");
 			return null;
 		}
